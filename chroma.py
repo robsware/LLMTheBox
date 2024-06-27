@@ -7,7 +7,7 @@ from langchain.document_loaders import TextLoader
 from langchain.embeddings.openai import OpenAIEmbeddings
 
 # Load a PDF document and split it into sections
-loader = TextLoader("data/htbtext.txt", encoding='cp437')
+loader = TextLoader("data/htbtext_short.txt", encoding='cp437')
 docs = loader.load_and_split()
 
 # Initialize the OpenAI chat model
@@ -19,7 +19,7 @@ embeddings = OpenAIEmbeddings()
 # Load the Chroma database from disk
 chroma_db = Chroma(persist_directory="data", 
                    embedding_function=embeddings,
-                   collection_name="lc_chroma_demo")
+                   collection_name="htb_small_db")
 
 # Get the collection from the Chroma database
 collection = chroma_db.get()
@@ -31,14 +31,16 @@ if len(collection['ids']) == 0:
         documents=docs, 
         embedding=embeddings, 
         persist_directory="data",
-        collection_name="lc_chroma_demo"
+        collection_name="htb_small_db"
     )
 
     # Save the Chroma database to disk
     chroma_db.persist()
 
 # Prepare query
-query = "I am testing a website that is built in PHP. Based on this document, what vulnerabilities can I look for?"
+#query = "I am testing a website that is built in PHP. Based on this document, what vulnerabilities can I look for?"
+query = "Answer questions based on the document you have received. Give me an example of each vulnerability. Based on this document, what vulnerabilities can I look for?"
+
 
 print('Similarity search:')
 print(chroma_db.similarity_search(query))
@@ -48,7 +50,7 @@ print(chroma_db.similarity_search_with_score(query))
 
 # Add a custom metadata tag to the first document
 docs[0].metadata = {
-    "tag": "demo",
+    "tag": "htb_small",
 }
 
 # Update the document in the collection
@@ -58,7 +60,7 @@ chroma_db.update_document(
 )
 
 # Find the document with the custom metadata tag
-collection = chroma_db.get(where={"tag" : "demo"})
+collection = chroma_db.get(where={"tag" : "htb_small"})
 
 # Prompt the model
 chain = RetrievalQA.from_chain_type(llm=llm,

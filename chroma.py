@@ -1,9 +1,3 @@
-# https://www.gettingstarted.ai
-# email: jeff@gettingstarted.ai
-# written by jeff
-
-# Don't forget to set your OPEN_AI_KEY
-# In your terminal execute this command: export OPENAI_API_KEY="YOUR_KEY_HERE"
 
 # Import required modules from the LangChain package
 from langchain.chains import RetrievalQA

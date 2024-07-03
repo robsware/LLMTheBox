@@ -14,8 +14,11 @@ def extract_htb_data():
             # Send a GET request to the URL
             response = requests.get(url)
 
-            # Parse the HTML content
-            soup = BeautifulSoup(response.content, 'html.parser')
+            # Replace the specific phrase in the HTML content
+            cleaned_content = response.text.replace("CTF solutions, malware analysis, home lab development", "")
+
+            # Parse the cleaned HTML content
+            soup = BeautifulSoup(cleaned_content, 'html.parser')
 
             rows = soup.find_all('tr')
 

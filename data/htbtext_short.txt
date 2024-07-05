@@ -156,7 +156,7 @@ This doesn’t take effect until the GPO refreshes. HHogan has permissions to ru
 Now HHogan is in the administrator’s group:
 It won’t show in my current session, but on exiting and reconnecting:
 And I can read root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 10 Feb 2024
@@ -263,7 +263,7 @@ The coming-soon page has two similar rules. The first redirects requests for /co
 The second rewrites requests to /coming-soon to return coming-soon.html:
 The last rule is called “Redirect to domain”:
 It matches on any url, except the condition looks at the {HTTP_HOST}, which is the Host header in the request. That regex is using a negative lookahead to say that any pattern that does not start with crafty.htb will match. Said differently, if the Host header doesn’t start with “crafty.htb”, then this rule will match and redirect to http://crafty.htb.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 27 Jan 2024
@@ -361,7 +361,7 @@ Same error, and no ICMP packets at my host. Some testing and playing around with
 I’ll upload Chisel to the box and use it to create a tunnel from 5985 on my host to 5985 on Pov. Then I can connect over Evil-WinRM:
 From here, the same command as above outputs nothing:
 But this time I get a shell at nc:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 20 Jan 2024
@@ -525,7 +525,7 @@ I haven’t run into any issues with AV yet (that PHP webshell using system is t
 I’ll upload it to the snort_dynamicpreprocessor directory:
 The next time Snort runs (every even minute), there’s a shell as administrateur at nc:
 root.txt is the on administrateur’s desktop:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 06 Jan 2024
@@ -618,7 +618,7 @@ It takes about 3 seconds, but doesn’t break anything. I’ll try -m 120, which
 It cracks in two seconds to “monkeybizness”.
 That password works for root on Bizness:
 And I can get root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 02 Dec 2023
@@ -812,7 +812,7 @@ Appending is nice so I can target the authorized_keys file and it will add, not 
 I’ll run the exploit targeting root’s authorized_keys file:
 It works!
 And I can read the root flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 13 Jan 2024
@@ -948,7 +948,7 @@ It has 61 files:
 I only care about one file:
 With that key, I can SSH into Monitored as root:
 And read root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 11 Nov 2023
@@ -1080,7 +1080,7 @@ If it’s not found, it returns 404. If it is found, it processes it by saving t
 That explains why the hash is unique to Napper. It’s been modified to what it does next. The screenshot in the Elastic Post showed it was called directly from this malware. I suspect the original malware was having issues when multiple players were trying to use it at the same time, so this modification was made so that each players request would start a new process and their shells would not hang the backdoor for other players.
 DotPeek works on RunA.exe as well. It’s very simple:
 Main handles the base64-decode, loading it as an Assembly, and then running the Run() constructor:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 25 Nov 2023
@@ -1193,7 +1193,7 @@ Regardless of how I got to this menu, here I’ll enter “V”:
 At this menu, I can select “V” to get back into less. It takes a minute generating a report depending on the report size. Once it’s done, it opens in less:
 To escape from less, I’ll type !/bin/bash, and I’m dropped to a root shell:
 And I’ll grab the root flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 09 Dec 2023
@@ -1340,7 +1340,7 @@ Because I’m trying to “launch zmdc”, I’ll use the startup command:
 Now there’s a new SetUID/SetGID binary:
 Running with -p to not drip privs gives a shell with effective ids of root:
 Which is enough to read the flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 18 Nov 2023
@@ -1543,7 +1543,7 @@ This is the Ghostscript binary, and the -dNOSAFER flag is, according to the docs
 -dNOSAFER (equivalent to -dDELAYSAFER).
 This flag disables SAFER mode until the .setsafe procedure is run. This is intended for clients or scripts that cannot operate in SAFER mode. If Ghostscript is started with -dNOSAFER or -dDELAYSAFER, PostScript programs are allowed to read, write, rename or delete any files in the system that are not protected by operating system permissions.
 This mode is required for the exploit to work.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 04 Nov 2023
@@ -1649,7 +1649,7 @@ Running that gets down under 20 seconds:
 Minor improvement, so probably not worth it here, but if the delay on success was longer, it would definitely be!
 With the password, I can su to root:
 And grab root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 09 Sep 2023
@@ -1811,7 +1811,7 @@ Now that I have a ST / TGS ticket as DC01$ for delegator$, delegator$ can use th
 With this ticket as the machine account, I can dump hashes from the DC. The KRB5CCNAME environment variable will point to the ticket, and then the -k and -no-pass options will tell secretsdump.py to use it:
 With the admin hash, I can pass that to Evil-WinRM to get a shell:
 And root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 07 Oct 2023
@@ -1899,7 +1899,7 @@ The exploit I like is this:
 This code escalates and runs the id command, and pasting it in returns a user id of root:
 If I update that by replacing id with bash:
 And grab root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 21 Oct 2023
@@ -1998,7 +1998,7 @@ I’ll use ntpdate to sync my VM’s time to Manager’s:
 Now it works, leaking the hash:
 With the hash, I can get a shell as administrator using Evil-WinRM:
 And grab root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 28 Oct 2023
@@ -2158,7 +2158,7 @@ I’ll upload this to the Libraries directory:
 Now I’ll connect to the service over my Chisel tunnel and trigger it:
 It hangs, and there’s a shell as administrator:
 And root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 02 Sep 2023
@@ -2260,7 +2260,7 @@ It works. I can use this to make a SetUID bash:
 Now running it (with -p to not drop privs) gives a root shell:
 GTFObins gives a shorter path, using redirection to get the shell immediately from the ssh process:
 Either way, I can grab the flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 30 Sep 2023
@@ -2376,7 +2376,7 @@ Running it without args gives the usage, and running the example shows it gets s
 I’ll get a reverse shell and run it:
 It just hangs, but at nc:
 And I can grab the flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 14 Oct 2023
@@ -2550,7 +2550,7 @@ The last one looks perfect. And 0x401913 (one byte after) is just ret.
 I’ll generate the following script:
 Running this locally gives a shell:
 If I give it the SSH argument, it works remotely:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 12 Feb 2024
@@ -2627,7 +2627,7 @@ When I run that, it prints the SSH key.
 Regardless of how I get it, with the recovered key (and permissions set to 600), I can SSH as root into Builder:
 And get root.txt:
 ###
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 12 Aug 2023
@@ -2701,7 +2701,7 @@ To use this key on Linux, I’ll need to convert it to a format that openssh can
 Then I’ll convert it:
 Now it works:
 And I’ll grab root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 22 Jul 2023
@@ -2940,7 +2940,7 @@ The website allows uses to create “domains” which it then handles as virtual
 The nginx config is in /etc/nginx/sites-enabled/default:
 This is a neat nginx config. $http_host is the value in the Host HTTP header. If the (!-d /sites/$http_host) checks if a folder exists for that host, and if not, it returns a redirect to www.webhosting.htb. Then it sets the HTTP root to /sites/$http_host. It’s quite simply, but still very clever.
 For anything in the /hosting/ directory, it is forwarding it to 127.0.0.1:8080, which is actually another docker container that runs the hosting-app.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 23 Sep 2023
@@ -3083,7 +3083,7 @@ Ippsec actually pointed this one out to me (though I’m embarrassed I missed it
 I’ll create a simple C program that unsets the LD_PRELOAD variable (to prevent loops), sets the privileges to root user and group, and runs bash:
 There’s no compilation tools on the host, but since both it and my VM are Ubuntu-based, compiling locally shouldn’t cause issues. I’ll generate a .so file:
 I’ll copy this file up to Clicker into /tmp. Now I can run with LD_PRELOAD pointing at this shared object and it will run bash:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 27 May 2023
@@ -3264,7 +3264,7 @@ This is because of the root parameter passed to download, which has Express retu
 This code path uses the archiver module. It creates an archiver object, and then uses the file API to add files to the object.
 The file path this time is created with a path.join(__dirname, "books", id), which is totally open to traversal as I control id.
 It tries to look the book name up in the database using the Book object, but it is nice enough to use notation such that if no book name is found, it will fall back to “Unknown”. This is why all of my exfil when I do get a directory traversal comes out as Unknown.pdf, and what limits me from trying to collect multiple files in the same archive.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 26 Aug 2023
@@ -3411,7 +3411,7 @@ Now when I upload that zip, Zipping will unzip shell.pdf and return me the link 
 I know that file is at /var/www/html/uploads/ea409d50349a8436fe49f7ec66aa6132/shell.pdf, so I can visit:
 And it runs the given command, id:
 That’s a super cool trick!
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 08 Jul 2023
@@ -3458,7 +3458,7 @@ Running this command prints the status of the service:
 If the screen is not big enough to handle the output of systemctl, it gets passed to less. In fact, because I’m in a weird TTY, when I run with sudo, this happens:
 At the bottom of the terminal there is text and it’s actually hanging. If I enter !sh in less, that will run sh, and drop to a shell:
 And I can grab the flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 01 Apr 2023
@@ -3643,7 +3643,7 @@ I’ll use certipy to request a certificate and key for administrator:
 Using administrator.pfx, I’ll dump the NTLM hash for administrator:
 Regardless of how I get the administrator user’s NTLM, I’ll use it to get a shell over WinRM:
 And grab root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 15 Jul 2023
@@ -3769,7 +3769,7 @@ I’ll make sure my clock is in sync with Authority:
 And get a Silver Ticket:
 With this, I can dump the NTLM hashes from the DC:
 That hash works over Evil-WinRM:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 19 Aug 2023
@@ -4066,7 +4066,7 @@ For any server name that doesn’t match another, it returns a 301 redirect to h
 The final server is for cybermonday.htb:
 For a request to /, it tries to find a file at the URI, URI plus slash, and at index.php. For anything ending in .php, it passes it to the app on port 9000.
 The vulnerability is in the location /assets. That should have a trailing /. Without it, I can do what I did above.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 24 Jun 2023
@@ -4156,7 +4156,7 @@ This repo has a working Python exploit that abuses the plugin creation method. I
 The output is a file named binwalk_exploit.png. I’ll upload it into the shrunk directory:
 From there, I’m able to SSH in as root:
 And get the root flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 17 Jun 2023
@@ -4343,7 +4343,7 @@ In this video, I’ll dig into the Flask application on Sandworm, see how it sta
 In /home/atlas/.config/firejail there’s a file webapp.profile. (There is also a backup copy in /root that is used by the cleanup script to restore this in case HackTheBox players mess with it). This is what shows up in the Firejail command line, /usr/local/bin/firejail --profile=webapp flask run. It’s saying run flask run inside the jail with that profile.
 The profile has the following:
 The interesting parts are where it sets a private tmp, opt, dev, and bin. The first three are basically empty. bin gets mapped a handful of binaries (the ones I was able to run from within the jail). It also configures the website directory so that submissions can be written to but not executed from.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 05 Aug 2023
@@ -4508,7 +4508,7 @@ client is the Prisma ORM, and it’s making a query to the Files table based on 
 The bug here is the next check. It is using ?. as the Optional Chaining operator. This is a way to query into an object where the object might not exist. The author likely intended to have it check for private or different author or not exist, and return 404 for any of those. The problem is, if fileEntry does not exist, then fileEntry?.private returns False, and it does not 404.
 Express routes take a request (req) and response (res) object. Once past the 404, it uses the path library to join the uploads directory with the passed in file id, and returns the raw version of that (with res.download).
 Because fileEntry?.name is False, it returns “Unknown” as the filename:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 09 Nov 2023
@@ -4585,7 +4585,7 @@ This will be the shared library, and on being loaded, it will change the bash ex
 Now I just need to run something that starts as root. sudo -l will work nicely:
 It fails to load a bunch of shared objects, but if it loaded pwn.so, then /tmp/rootshell should be SetUID and SetGID now. It is:
 Running it with -p returns a root shell:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 10 Jun 2023
@@ -4713,7 +4713,7 @@ It works:
 In this one, I just need to change two instances of /var/www to /opt on the last line:
 Now running gnuplot networkplot.plt runs without error.
 Now refreshing the website shows two plots:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 29 Jul 2023
@@ -4872,7 +4872,7 @@ It is possible to trigger a block list in index.php on the proxy site. The direc
 The page starts with the comment I saw in the responses, followed by the is_blacklisted function:
 It seems to block “localhost”, “127”, and then a ton of possible schemes. This is not a very interesting or realistic filter, but it makes for an interesting challenge.
 The rest of the page uses curl to make a query to the value of the URL parameters (if it’s not blocklisted), and then returns the result.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 03 Jun 2023
@@ -4995,7 +4995,7 @@ One way to get a shell as root would be to write an SSH key into /root/.ssh/auth
 When I run this, there’s a a hit at my webserver:
 It reports that it got the file, but then complains that it wasn’t a valid file, likely because it isn’t formatted as expected.
 Still, it must have written, as I can now log in as root over SSH:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 01 Jul 2023
@@ -5167,7 +5167,7 @@ I’ll write a script to test this out:
 I have the target hash of “582fe8243c33a457d38b9922c7db4c39”. I’ll start with the first known 33 bytes, and then just append nulls until it matches. It instantly prints 500:
 Before I had seen the “(default 500)” in the help menu, this felt like a huge discovery. Now it just makes perfect sense.
 My best theory is that the program creates an -l size buffer, and then reads up to that many bytes into it. If that’s the case, the buffer could be nulled beforehand, or it could just happen to have nulls in it most of the time.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 20 May 2023
@@ -5255,7 +5255,7 @@ Back in my shell, I’ll run it (with -p to not drop privs):
 With that I can read root.txt:
 I thought it would be interesting to see how the GRPC application is set up and configured, and I find it in /opt:
 The GRPC Python module creates the app_pb2.py and app_pb2_grpc.py files from the app.proto file, and then app.py uses those to run the service. This video has more details:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 13 May 2023
@@ -5411,7 +5411,7 @@ This satisfies 1 by ending in .php. For 2, because there’s another /, it doesn
 To patch this, the server configuration block in /etc/nginx/sites-enabled/microblog.htb was updated to:
 The fix here is less complete. It now looks for any number of /.php on the end and still sends handles that as an attachment. But it doesn’t allow for extra stuff before the /.php. So even today while the exact URL originally used to unintended the box is blocked:
 Any variation that appends anything besides /.php still work:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 28 Sep 2023
@@ -5500,7 +5500,7 @@ It gets the full path to the file that triggered the action, and then calls New-
 It checks if SystemSettings is running, and kills it if so. Then it starts the process of the path, effectively double clicking on the theme. After a 15 seconds sleep, it removes the theme file.
 The full source for the script is here:
 
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 06 May 2023
@@ -5631,7 +5631,7 @@ With --file-list or -f, it will get a list of files to scan from a file. Wheneve
 Here, it reads the hash out of root.txt, and then tried to read the file with named by that hash. But that hash isn’t a file, so it fails, and in the error message, prints the flag!
 The same trick works to read /root/.ssh/id_rsa:
 Some bash foo will print that nicely by getting just the first of the two error lines and isolating just the content:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 13 Sep 2023
@@ -5706,7 +5706,7 @@ More interestingly, it works on wlan2:
 Even more interestingly, when I ran this on wlan2, I had wash -i mon0 running in another terminal, and it printed as result at the same time:
 My current theory to explain all of this is:
 That’s what I’ve got at the moment! Please reach out on Twitter (0xdf_) or Discord (0xdf) if you have a better understanding!
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 04 Feb 2023
@@ -5982,7 +5982,7 @@ To get a shell, I’ll simply update 0xdf.sh to create a SetUID/SetGID copy of b
 Now I crash another process:
 And start my shell:
 I’m able to read the flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 29 Apr 2023
@@ -6064,7 +6064,7 @@ Inside the container, I’ll make a copy of bash and set it to SetUID:
 On the host, this shows up as 4777 (note the s where the owner x would be):
 Running it (with -p to not drop privs) gives a root shell:
 And I can read root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 22 Apr 2023
@@ -6210,7 +6210,7 @@ To get a shell, I’ll update my setup.py:
 Now instead of touch a file, it copies bash and sets it as SetUID. I’ll do the same steps, python -m build, upload, set the repo public (there’s a cron constantly resetting that), and run the command as john:
 Now /tmp/0xdf is bash, which I can run with -p to keep root:
 And read the root flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 15 Apr 2023
@@ -6369,7 +6369,7 @@ It has five passwords:
 That password works to get to the root account using su:
 And read the root flag:
 I wanted to take a look at the automation scripts and what was causing me to get dropped from tracing with my loop. I’ll walk through that in this quick video:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 08 Apr 2023
@@ -6462,7 +6462,7 @@ I’ll run system-checkup.py and it reports success:
 /tmp/0xdf is there, owned by root, and the s bit is on:
 I’ll run with -p to not drop privs:
 And grab root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 04 Mar 2023
@@ -6571,7 +6571,7 @@ The first step of the box is to use Flask debug to get onto the host and get dat
 With access to this key, it is easy to forge a Flask cookie for any user (like in Rainyday or Noter). Reading the /etc/passwd file will give usernames to try, and then logged in as corum, it’s as simple as SSHing into Agile.
 This was patched by setting this to a random 32 characters on each application startup:
 This strategy has drawbacks - if the application restarts, then all existing cookies become invalid. That might bring real issues in the real world, but it works perfectly well for a HTB machine.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 18 Mar 2023
@@ -6757,7 +6757,7 @@ Running this returns a warning:
 It’s warning me that while the exploit might go through the proxy, the resulting payload will not. I’ll say that’s ok, as I suspect that Cerberus can connect back to me (if it fails, I’ll explore other vectors).
 Running now returns a shell as SYSTEM:
 And can grab the root flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 19 Nov 2022
@@ -6955,7 +6955,7 @@ WebAssembly is stack-based, where calls to .get push items onto the stack, and .
 In Chromium dev tools, it shows where I am (green highlighted line), as well as the stack (currently empty) and the variables in use on the right:
 I won’t get too deep into the actual WASM and what it is legitimately doing to format the page with the post metadata, but I’ll work into it enough to find the overflow.
 Some trial and error shows that $func4 is strcpy. This code calls strcpy to copy the date string onto the stack, then moves 48 bytes up the stack and calls strcpy to copy the name. As it’s an unsafe strcpy (which I can tell by trying it and verifying that there’s no length check), the username string writes into the date string.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 25 Mar 2023
@@ -7071,7 +7071,7 @@ There’s a ton of files in qreader_extracted. I’ll want to focus on qreader.p
 It’s not supported for this version of Python.
 The other tool referenced on the PyInstxtractor page is Decompyle++, which is now pycdc. I’ll install with the instructions in this stackoverflow post:
 Now I can run it, and it works:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 11 Mar 2023
@@ -7165,7 +7165,7 @@ The simplest way to run some command via Ansible is with the built-in Shell modu
 I’ll save this as /opt/automation/tasks/0xdf.yml. When the cron runs, there’s a new file in /tmp:
 This is a copy of bash that’s owned by root with the SetUID bit enabled. So when I run this (with -p to maintain privs), I get a shell as root:
 More specifically, it’s with effective userid of 0 / root (check out this post for a detailed breakdown of what’s happening here). Regardless, I can read root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 03 Dec 2022
@@ -7357,7 +7357,7 @@ I am curious to find out the line between 2394 and 2218. I’ll add some lines o
 Some experimenting shows that when the file is 2218 bytes it does not work, but 2217 bytes does. Now it’s not the raw file coming back as I am exfiling it, but the base64 encoded version, which will be roughly 4/3 the size. 2995 works, but 2999 fails:
 It’s not super important what the exact limit is. I suspect PHP is limited at 3000 and counting perhaps the GET  as part of it. The important part is to know this could happen, and plan around it.
 One thing I could do also is use a deflate filter before base64-encoding, which would compress the text and give me much more exfil. On the other hand, then it would be more of a pain to decode.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 14 Jan 2023
@@ -7445,7 +7445,7 @@ Now I run that with sudo:
 /tmp/0xdf is there, owned by root, and has the s in the owner execute field.
 I’ll run it with -p to keep privs, and get a shell as root:
 And the root flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 25 Feb 2023
@@ -7560,7 +7560,7 @@ xp_cmdshell is still disabled, but unlike sql_svc, the administrator user has pe
 The commands are still running as sql_svc. That’s because sql_svc is still the process running the MSSQL service. It is just able to negotiate with the OS to read file as administrator because it has that ticket.
 With file read and write as administrator, I can turn that into execution as administrator. This PayloadsAllTheThings page shows various methods. I showed the DiagHub method in HackBack, though it has since been patched. I showed the WerTrigger method in Proper, and I believe that one still works.
 Or I can use the shell through MSSQL and abuse SeImpersonatePrivilege with a Potato exploit (as I’ve shown many times before).
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 17 Dec 2022
@@ -7691,7 +7691,7 @@ This will drop into Bash for an interactive shell.
 Looking at the list of locations, I can obviously write to ~/.dstat, but when run with doas, it’ll be running as root, and therefore won’t check /home/player/.dstat. Luckily, /usr/local/share/dstat is writable.
 With that in place, I’ll invoke dstat with the 0xdf plugin:
 And grab the flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 7 Jun 2023
@@ -7804,7 +7804,7 @@ Here’s to the next chapter, where we will continue to push the boundaries of c
 With deepest gratitude,
 The HackTheBox Team
 I made a quick video looking at the website source code. It’s a PHP application using routers defined in index.php. Both mistakes I exploited above were made in a very realistic way, which was fun to see.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 18 Feb 2023
@@ -7936,7 +7936,7 @@ This creates a .csproj file, a starter Program.cs, and an obj directory. The sou
 It runs:
 I’ll update Program.cs to invoke a shell just as I did above:
 It works:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 24 Sep 2022
@@ -8110,7 +8110,7 @@ The machine account is not in that group, and thus I can use this recovered NTLM
 I’ve shown using an admin hash with secretsdump.py many times before. The DC machine account is also authorized to do this, and it can also be done with crackmapexec:
 From my shell as winrm_user, it’s clear that administrator is also not in the Protected Users group:
 The NTLM hash for administrator can be used to get a shell as administrator:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 26 Nov 2022
@@ -8182,7 +8182,7 @@ I’ll go through these in this video:
 The short summary is that nginx is using a module named passenger. This allows nginx to handle the Ruby application. I’ll show how nginx is doing that, as well as the docs that show how that application is configured.
 I’ll look at the Ruby app to see how it generates PDF and handles GET and POST requests.
 I’ll also see that local hosts are not blocked, but find a DNS issue, and fix it with the hosts file such that I can export the main page to PDF.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 11 Feb 2023
@@ -8298,7 +8298,7 @@ Today, that script is:
 On release, it was:
 Both start off by removing any files in the fonts directory that are modified in the last five minutes minutes. The original script then copies a clean dompdf_font_family_cache.php into fonts, and changes the ownership and group.
 The patched script makes a copy within /root, and changes the ownership there. Then it moves that copy into place. This prevents the symlink attack.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 05 Nov 2022
@@ -8453,7 +8453,7 @@ Those hashes work for a pass the hash attack:
 It shows Pwn3d! because the creds are good and this is an administrator account.
 psexec.py works to get a shell from here:
 And the final flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 29 Oct 2022
@@ -8545,7 +8545,7 @@ I’ll use the passpie copy command, which has a --to parameter:
 It works:
 From there, su will give a root shell:
 And the root flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 21 Jan 2023
@@ -8646,7 +8646,7 @@ Now I’ll get two shells on Investigation. In the first, I’ll run an infinite
 This checks for the existence of lDnxUysaQn, and if it’s there, moves it to garbage and copies 0xdf.sh over it. Then it sleeps for a second and removes the file.
 Now when I run binary, it doesn’t matter what’s in the file, but it has to exist (so that curl returns success and the file is executed). When I run this:
 It may not trigger every time, but it was most for me. Because it’s waiting for the file to appear, the timing works out that it moves it just at the right time.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 28 Jan 2023
@@ -8809,7 +8809,7 @@ But I tried that above! It didn’t work. On comparing notes, the difference was
 I’ll play around with this in this video):
 The summary is that PHP’s parse_url function, despite it’s claim that “Partial and invalid URLs are also accepted, parse_url() tries its best to parse them correctly”, fails when the scheme is missing entirely, and returns nothing:
 That means that this check works as expected with http://image.haxtables.htb, but is bypassed when given image.haxtables.htb:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 07 Jan 2023
@@ -8927,7 +8927,7 @@ My payload will copy bash into /tmp and set it as SetUID to run as root (I origi
 After two minutes, there’s a SetUID binary in /tmp:
 I’ll run that with -p to not drop privs and get a shell as root:
 And read the flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 10 Sep 2022
@@ -9115,7 +9115,7 @@ One of the saved logins is for bob.woodADM@windcorp.com on webmail.windcorp.com.
 I’ll run kinit to get a ticket as this user with this password, and connect over Evil-WinRM:
 bob.woodADM is in the Domain Admins group:
 And can read root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 
 
@@ -9212,7 +9212,7 @@ nginx is in the httpd_t role. audit2why showed that this role needs some permiss
 audit2allow will give you a list of things that are blocked, and what the things to allow so that none of them would be blocked. In short, if you installed SeLinux on a clean system, put it into permissive mode, ran for a short period of time, and then allowed everything, as long as your system wasn’t exploited during that time, you can get a good snapshot of what you do that’s legit.
 For a suspected compromised host, you can use this to look at everything SeLinux blocked:
 So it is detecting httpd_t trying to make connections, snmpd_t trying to read files, etc.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 30 Jan 2021
@@ -9330,7 +9330,7 @@ We took advantage of the fact that the vulnerable application was running in Doc
 With 16 listening containers, we now wanted a way to load balance users across these instances. IppSec looked into a way to do it with a kernel module (which he talks about in his video for Validation), but we ended up going with a solution using IPtables. In /root/automation, there’s a rules.sh file which sets the rules on boot:
 For each rule, it’s matching on a destination port of 5000. For a given IP, it will use a mask of 0.0.0.15. 15 is 1111 in binary, so it’s look at the low four bits of the source IP, and comparing that to the defined value.  So 0.0.0.4/0.0.0.15 would match on a .4, .20, .26, etc. With 16 rules, each IP is covered by only one of them. Each rule will do a NAT rewrite to forward you to one of the containers.
 Effectively, this means for a given instance of sink, 1/16 of the players are targeting each container.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 13 Sep 2021
@@ -9412,7 +9412,7 @@ One of the challenges any box creator has when they want to make a challenge is 
 For UHC, this box was live for a period of time where players from across the world would be hacking it at the same time, many competitively racing to be the first to finish.
 I noticed ports 5000-5008 were filtered in my initial nmap scan. These ports are actually different Docker instances of the same exploitable webapp (I think he actually used 5000-5031). Then he has a kernel module that is re-writing incoming packets for TCP 80 based on the source IP to one of the containers, so there’s significantly fewer players interacting with each instance.
 IppSec goes into details in his video (where he has access to the kernel module source that we do not):
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 03 Apr 2021
@@ -9555,7 +9555,7 @@ The file is rce.zip, and it is a zip archive that contains two files with some d
 version.php gives some metadata about the “plugin”:
 block_rce.php is a simple webshell:
 Moodle must unpack the plugin into the /blocks/ directory, where I can then access it.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 10 Apr 2021
@@ -9684,7 +9684,7 @@ Category: Shell as root
 Despite my efforts to keep my container running, there seems to be a cron killing containers every minute or so. And I want a full shell anyway.
 I’ll run the two commands again to recreate and get a shell in the container, and then I’ll write an SSH key. I’ll need to create the /root/.ssh directory:
 Now I can connect as root over SSH:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 30 Aug 2021
@@ -9798,7 +9798,7 @@ To get shell, I’ll copy Bash into tmp:
 Now chmod to set it as SUID:
 Notice the s as the forth letter there. Running it with -p will preserve privilege:
 And I can get the last flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 22 May 2021
@@ -9844,7 +9844,7 @@ Running knife data bag create 0xdf output -e vim will open a new bag in vim:
 I’ll escape vim with :!/bin/bash:
 More simply, knife has an exec command that will run Ruby code. This is the technique now on GTFObins, but it wasn’t there when Knife released. There was a GTFObins page on Ruby that shows running sudo ruby -e 'exec "/bin/sh"'. The Ruby code there is exec "/bin/sh". Using the same Ruby code here works:
 This one is actually cool because I can run it through the PHP vuln and get both flags in one command:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 13 Mar 2021
@@ -10026,7 +10026,7 @@ I’ll copy that output exe to my Parrot VM, and then upload it to Proper:
 The gif on GitHub shows it running as Exploit.exe whoami, so I’ll give that a try. It works:
 I’ll try a reverse shell with nc64.exe that I uploaded earlier:
 It hangs, but there’s a shell at another nc listener:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 20 Mar 2021
@@ -10343,7 +10343,7 @@ The uid matches. 0xf0802 == 985090, which is one more than the counter found on 
 As I showed earlier, connecting without a key fails. With the key, it prompts for a password:
 Pasting in the yubikey output returns a shell:
 And I can grab root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 01 May 2021
@@ -10443,7 +10443,7 @@ This requests the file from my Python webserver (now running out of my love dire
 Now I just need to run it with msiexec:
 This returns nothing, but there’s a shell at my listening nc:
 I can grab the root flag from the administrator’s desktop:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 06 Mar 2021
@@ -10545,7 +10545,7 @@ main.py is the guts of the Flask application. It create the flask application an
 Then it defines the different routes of the webapp. For example, /admin/upload:
 It is reading and writing files to the path defined as app.config['UPLOAD_FOLDER'], which I noticed above is ./admin/files.
 Putting that all together, the picture looks like:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 27 Mar 2021
@@ -10615,7 +10615,7 @@ This time the command is:
 The base64 string is pipped into base64 to decode it and then tee will output it to the paste and write it to shell.php.
 The command decodes to a PHP webshell:
 Now there’s a request to shell.php which is successful (running the hostname command to set up the prompt), and now it’s left to the user to issue additional commands.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 20 Feb 2021
@@ -10768,7 +10768,7 @@ So any key that totals to 0x641 will return the key. I can play with test string
 And that works:
 These work as well:
 In summary, the binary was not needed once I found the curl request. Still, worth showing how easily this kind of gate is to bypass.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 17 Apr 2021
@@ -10874,7 +10874,7 @@ However, I can just Invoke-Expression (or iex) the code. I can do so right from 
 Or from the local copy:
 Either way, the code is now loaded. Now I can run it to add a user:
 With admin priv, I can PSExec to get remote execution as SYSTEM:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 13 Feb 2021
@@ -10952,7 +10952,7 @@ I’ll also create deploy.sh that will create a .ssh directory for the root user
 Now I’ll run it:
 Now I can connect as root:
 And grab the flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 27 Feb 2021
@@ -11039,7 +11039,7 @@ To get a shell, I’ll replace the id line with the same reverse shell I used ea
 Now I’ll start the service:
 And get a shell as root:
 And root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 23 Jan 2021
@@ -11194,7 +11194,7 @@ This one is keytype 0x12 == 18 == aes256-cts-hmac-sha1-96. The other keytypes ar
 Presumable we could try to crack these and get passwords for these principles.
 The only thing I can’t explain at this point is the blocks of 0s proceeded by ffffc3 where the next length should be:
 Where there should be a length, there’s a negative sixty (0xffffffc3), followed by 0x3d (61) zeros. But if I allow that a length of -61 means jump forward 61 0s, I the rest of the file parses as expected. The parsing scripts don’t have anything in them to handle this, so they read this as a large number and exit. I suspect that’s why they don’t find all the keys.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 28 Oct 2017
@@ -11379,7 +11379,7 @@ I’ll try to pull some data. First, I’ll change that table to information_sch
 Now I can get that with curl:
 I can pull content as well:
 I need the mid on the results because if too much data comes back, it handles that as multiple lines, and breaks the error message.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 16 Jan 2021
@@ -11445,7 +11445,7 @@ I want a loop that will run constantly, looking for files starting with ssh- in 
 Now, in a second terminal, I’ll run sudo enableSSH.sh:
 Because it’s an attack on a race condition, I will lose the race sometimes, and I’ll know that because it’ll say that it successfully added root@ubuntu. When it fails, nobody@nothing will be in authorized_keys, and I’ll get the failure message:
 Then I can connect over SSH as root:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 14 Oct 2017
@@ -11585,7 +11585,7 @@ This time it works and returns a shell that outputs!
 I considered what would happen if I was able to predict the temp file name used to save the Zip archive as. If it were purely time based, I could guess the name generated off the next few seconds, and mess with watching for those files and trying to change them, or pre-creating them as symlinks to other important files.
 Unfortunately for me, the temp file name is generated from a combination of the current process process id (pid), the current time, and the current clock time for the process:
 I could potentially guess the pid of upcoming processes. I could also potentially guess the time. But there’s not a good way to guess the clock time into the process, which makes this seem too hard to pull off.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 06 Feb 2021
@@ -11672,7 +11672,7 @@ incron, from iNotify cron, is a service which will watch for different kinds of 
 The second is a trigger for the first step of privesc. It looks for write events to the hackers file, and then runs scanlosers.sh as pwn. That’s how the job managed to trigger immediately on log generation.
 The webpage takes an IP address and will nmap scan that IP. to prevent players from scanning other players in their network, I set it such that it would only scan the players own IP and other HTB machines with this logic:
 Basically, the given IP isn’t the users own IP and it starts with 10.10.1 but not 10.10.10 (to allow players to scan other HTB machines), then it uses static nmap output saying the host is down. It picks a random scan time between 2 and 4 seconds, and adds a sleep of that time for the right feel.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Nmap scan:
@@ -11860,7 +11860,7 @@ And I can grab the final flag:
 My theory was that I couldn’t access /admin on the main page because of the IP restrictions. Once I had SSH as sonny, I wanted to test that. I connected the SSH using -D to create a socks proxy going over the SSH session:
 I created a new proxy in FoxyProxy:
 When I enable this, it will try to proxy all Firefox traffic through localhost port 8888. I’ll file a couple cereal requests (they seem to get cleared as the admin views them), and then load /admin. It worked!
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 30 Sep 2017
@@ -11933,7 +11933,7 @@ Same result. What about ping after ping?
 It’s looking more and more that any command kills the execution. So why not echo? Well, echo is a Bash builtin. What about other builtins (see man bash), like printf and dirs?
 At this point, I don’t have any proof (I could go debugging Apache, but ugh, threads, sounds like a huge pain). I do have a good theory that I can’t find counter-examples for, and it’s this: Shellshock will run as many Bash builtins as given up to the first binary called and then stop. A slight caveat to that is that pipes don’t seem to break it. For example, I can pipe id into cut to get the first 10 characters of output without issue, even though neither cut nor id are builtins:
 ;, &&, and || following a  all seem to break execution at that point.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 09 Jan 2021
@@ -11991,7 +11991,7 @@ Now I can run with a rule file to get different variations on the passwords in t
 It cracks pretty quickly.
 That password works for the root account on Delivery:
 I can grab root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 23 Sep 2017
@@ -12122,7 +12122,7 @@ I can mount it, and access the file system:
 /root is the host system, with flag.txt, not the container with root.txt:
 The containers keep their file system mounted in /var/lib/lxc/:
 I can verify that as atanas I can’t just access that directory directly:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 12 Dec 2020
@@ -12187,7 +12187,7 @@ Instead of running commands, I could also mount the host filesystem. lsblk shows
 I’ll mount it, and now have access to the host filesystem:
 I can get the flag:
 There’s also an SSH key already there, or I could write my own into the authorized_keys file.
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 28 Jul 2017
@@ -12242,7 +12242,7 @@ While x64 is relatively universal for Windows systems today, in 2017 when this b
 shell_reverse_tcp is a raw command shell (non-meterpreter), and it is not staged (which is to say the entire payload is in that one exe, instead of just a stub that will connect back and get the rest). With both of those, I can just catch the shell with nc. If I wanted a staged payload, I would have done shell/reverse_tcp.
 With the username updated to “0xdf”, I’ll start nc, and run send_and_execute.py:
 At the line sixth from the end, where it says “Starting Service”, I get a connection at nc:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 19 Dec 2020
@@ -12471,7 +12471,7 @@ To demonstrate, I’ll create an empty file and upload it as /home/shared/k;ping
 The sleep 60 on the end just helps me know if this returns and still no ICMP, then it didn’t work.
 That will create a file with that long name. When Python walks that dir, it will create the string command: /usr/bin/ssh -l freshness -F k;ping -c 1 10.10.14.14; 127.0.0.1. When that string is passed to Popen, It will try to run the ssh and fail because k doesn’t exist. Then it will ping my VM. Then it will error on unknown command 127.0.0.1.
 The ICMP packets arrive just under a minute later showing it worked:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 05 Dec 2020
@@ -12558,7 +12558,7 @@ Running it, I’ll give it whoami, and the result comes back:
 I can wrap that in a while (true) loop:
 Now it will continually prompt for commands and run them:
 I’ll leave it here, but there are other improvements one could make:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 12 Apr 2021
@@ -12649,7 +12649,7 @@ They match!
 I’ll create a copy of the private key on my local VM, and set the permissions so that SSH will trust it:
 Now I can use it to auth as administrator:
 And get the final flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 17 Oct 2020
@@ -12763,7 +12763,7 @@ The third server is for s3.bucket.htb, and it will proxy everything to http://lo
 What is running on 4566? netstat gives the process as docker-proxy:
 Looking at the running containers, it’s a container called localstack:
 localstack is a local AWS cloud stack, designed for developers to develop and test cloud / serverless applications offline. It has a routes which listens on 4566, and manages all the requests to the correct service. This is a really neat way to bring the AWS testing experience to HTB!
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 14 Nov 2020
@@ -12851,7 +12851,7 @@ I’ll compile this and copy it to Laboratory with scp:
 I’ll also update the PATH variable so that /tmp is the first directory checked:
 When docker-security runs, when it makes the call to chmod, it will get the chmod binary from /tmp, which will return a shell:
 And I can grab root.txt:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 31 Oct 2020
@@ -12978,7 +12978,7 @@ The hash came back minutes later:
 Now I have the NTLM hash for the machine account of this domain controller. That can be used with secretsdump.py to dump the hashes for the rest of the AD:
 The administrator hash is enough to get a shell:
 And get the root flag:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 24 Oct 2020
@@ -13038,7 +13038,7 @@ The shell that came back dies in about 10 seconds, which is enough time to grab 
 This will create the directory /root/.ssh if it doesn’t exist, and then write my tiny ed25519 public key into the authorized_keys file.
 Still, cases come up where a short lived shell is all you can get. It’s interesting to see how to script commands to run on the shell. I’ll just echo them into the nc listener:
 It connects, and then I’ll Ctrl-C to exit and then connect over SSH, and it works:
-CTF solutions, malware analysis, home lab development
+
 
 Difficulty Rating:
 Release Date : 28 Nov 2020
@@ -13146,4 +13146,4 @@ With this string built, it will pass that into load:
 That is the dangerous part. load effectively loads the string into memory as Lua commands, and then the () runs that. It’s kind of like calling eval on a string in Python (also dangerous).
 In the dev version of this script, the error message generation is much cleaner:
 This time it’s just appending the city into the string, and then passing that to http.write.
-CTF solutions, malware analysis, home lab development
+

@@ -3,14 +3,19 @@
 import os
 from langchain.chains import RetrievalQA
 from langchain.vectorstores import Chroma
-from langchain.chat_models import ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
 from createchroma import initialize_chroma_db
 from scraper import scrape_links_and_save
 from download_page_content import extract_htb_data
+import warnings  # Import the warnings module
+
+# Suppress all warnings
+warnings.filterwarnings("ignore")
 
 
-def initialize_chat_model(model_name: str = "gpt-3.5-turbo", temperature: float = 0.8):
+
+def initialize_chat_model(model_name: str = "gpt-4-turbo", temperature: float = 0.8):
     """
     Initialize the OpenAI chat model.
 

@@ -1,6 +1,6 @@
 from langchain.vectorstores import Chroma
-from langchain.document_loaders import TextLoader
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_community.document_loaders import TextLoader
+from langchain_community.embeddings import OpenAIEmbeddings
 
 def initialize_chroma_db(file_path, persist_directory, collection_name):
     # Load a text document and split it into sections

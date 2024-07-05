@@ -8,8 +8,7 @@ LLMTheBox is a project that leverages HackTheBox writeups as educational materia
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+
 
 ## Introduction
 
@@ -33,6 +32,10 @@ Clone the repository:
    pip install -r requirements.txt
 
    ```
+
+
+## Installation
+
 Set up a .env file with your openAI API Key in the format OPENAI_API_KEY = "sk-xxxxx"
 
 During the first run, the chromaDB will need to be built and populated which may take a few minutes depending on your internet speed. 

@@ -34,7 +34,7 @@ Clone the repository:
    ```
 
 
-## Installation
+## Usage
 
 Set up a .env file with your openAI API Key in the format OPENAI_API_KEY = "sk-xxxxx"
 

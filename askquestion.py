@@ -125,10 +125,10 @@ def main():
     user_query = get_user_query()
     query = "Answer questions based on the document you have received. " + user_query
 
-    print('Similarity search:')
+    # print('Similarity search:')
     # print(chroma_db.similarity_search(query))
 
-    print('Similarity search with score:')
+    # print('Similarity search with score:')
     # print(chroma_db.similarity_search_with_score(query))
 
     response = execute_query(chroma_db, llm, query)

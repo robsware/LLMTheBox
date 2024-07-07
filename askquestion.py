@@ -116,7 +116,7 @@ def main():
         print("Downloading page contents...")
         extract_htb_data()
         print("Creating DB...")
-        chroma_db = initialize_chroma_db("data/htbtext_short.txt", "data", "htb_small_db")
+        chroma_db = initialize_chroma_db("data/htbtext.txt", "data", "htb_small_db")
         print("Chroma DB created successfully.")
     
 
